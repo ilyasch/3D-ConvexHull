@@ -366,12 +366,12 @@ void ConvexHullBuilder::setTwins(QVector<Dcel::Face*> &faces){
     QVector<Dcel::HalfEdge*> he2Set(faces.size());
     QVector<Dcel::HalfEdge*> he3Set(faces.size());
 
-    for(unsigned int i=0; i<faces.size(); i++){
+    for(int i=0; i<faces.size(); i++){
         he1Set[i] = faces.at(i)->getOuterHalfEdge();
         he2Set[i] = faces.at(i)->getOuterHalfEdge()->getNext();
         he3Set[i] = faces.at(i)->getOuterHalfEdge()->getNext()->getNext();
     }
-    for(unsigned int i=1; i<=faces.size(); i++){
+    for(int i=1; i<=faces.size(); i++){
         he2Set[i%faces.size()]->setTwin(he3Set[i-1]);
         he3Set[i-1]->setTwin(he2Set[i%faces.size()]);
     }

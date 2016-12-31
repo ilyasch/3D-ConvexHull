@@ -73,7 +73,7 @@ void ConvexHullManager::on_convexHullPushButton_clicked() {
 
             // Coloring Convex hull with red color
             for (Dcel::FaceIterator fit = dcel->faceBegin(); fit != dcel->faceEnd(); ++fit)
-                (*fit)->setColor(QColor(142,0,0));
+                (*fit)->setColor(QColor(212, 36, 38));
             dcel->updateBoundingBox();
             /***
              * Warning: updateFaceNormals() crashes if there is at least one half edge which doesn't have

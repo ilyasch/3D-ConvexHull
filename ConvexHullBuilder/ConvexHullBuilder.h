@@ -15,7 +15,7 @@ public:
     bool build(bool showphases , MainWindow* mMainWindow);
 private:
     DrawableDcel* mDcel ;
-    std::vector<Dcel::Vertex*> mVertices;
+    std::vector<Pointd> mVertices;
     ConflictGraph* mG;
 
     void init();
@@ -24,10 +24,10 @@ private:
     void createFaceFromVertex(Dcel::Vertex* p3,Dcel::HalfEdge* h);
 
     QList<Dcel::HalfEdge*> findHorizon(std::vector<Dcel::Face*> horizon);
-    QMap<Dcel::HalfEdge*,std::vector<Dcel::Vertex*>> getVisibleVerticesFromHorizon(QList<Dcel::HalfEdge*> horizon);
+    QMap<Dcel::HalfEdge*,std::vector<Pointd>> getVisibleVerticesFromHorizon(QList<Dcel::HalfEdge*> horizon);
     void deleteFacesFromCH(std::vector<Dcel::Face*> visiblefaces);
     Dcel::Face* addFace(Dcel::Vertex* otherVertex, Dcel::HalfEdge* existingHe);
-    void setTwins(std::vector<Dcel::Face*> faces);
+    void setTwins(std::vector<Dcel::Face*> &faces);
 };
 
 #endif // CONVEXHULLBUILDER_H

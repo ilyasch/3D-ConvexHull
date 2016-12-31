@@ -1,4 +1,4 @@
-Come far compilare il progetto su ubuntu:
+How to compile the Project in Ubuntu :
 
 Installare QtCreator e Qt5.
 sudo apt-get install qtcreator qt5-default
@@ -6,13 +6,13 @@ sudo apt-get install qtcreator qt5-default
 Installare le seguenti librerie:
 sudo apt-get install libboost-all-dev libcgal-dev libgmp-dev libqglviewer-dev
 
+If "libqglviewer-dev" is not able to be installed, you will found a.deb of the library to install
 
-Documentazione Dcel:
+Documentation of the project:
 
-Installare Doxygen:
+Install Doxygen:
 sudo apt-get install doxygen
 
-dalla cartella lib:
+Activate the doc in /lib:
 doxygen dcel_doxygen_config_it
-
-verrà creata una cartella chiamata "dcel_doc" contenente html della documentazione
+a "dcel_doc" in <HTML> will be generated

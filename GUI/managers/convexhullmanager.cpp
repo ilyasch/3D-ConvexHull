@@ -71,9 +71,9 @@ void ConvexHullManager::on_convexHullPushButton_clicked() {
             ss << t.delay();
             ui->timeLabel->setText(ss.str().c_str());
 
-            // Coloring Convex hull with cyano color
+            // Coloring Convex hull with red color
             for (Dcel::FaceIterator fit = dcel->faceBegin(); fit != dcel->faceEnd(); ++fit)
-                (*fit)->setColor(QColor(0,255,255));
+                (*fit)->setColor(QColor(142,0,0));
             dcel->updateBoundingBox();
             /***
              * Warning: updateFaceNormals() crashes if there is at least one half edge which doesn't have

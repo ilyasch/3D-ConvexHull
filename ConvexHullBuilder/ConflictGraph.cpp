@@ -77,8 +77,7 @@ void ConflictGraph::deleteVertex(Pointd vertex){
     }
 }
 
-//TODO : badal hatchi b mes commentaires bach yrja3 mtiitaz e chra7 had la phase f rapport
-/*!
+/*! Efficent Way to check the visibility
  * \brief ConflictGraph::IsVisibile
  * \param face
  * \param v
@@ -87,7 +86,6 @@ void ConflictGraph::deleteVertex(Pointd vertex){
 bool ConflictGraph::IsVisibile(Dcel::Face* face, Pointd v){
        Dcel::Vertex* ve = *(face->incidentVertexBegin());
        //if the dot product betweet it and the face normal is positive => the vector lies in the same semi-space of the normal => implying that the vertex sees the face
-       //I use this form instead the determinant of the 4x4 matrix for performance
        Pointd vertices[3], vec1, vec2, dir;
           //get the vertices of the face
           int i=0;
@@ -97,7 +95,6 @@ bool ConflictGraph::IsVisibile(Dcel::Face* face, Pointd v){
                 i++;
           }
           //the normal vector is the cross product between two edge vectors of the face
-          //I don't normalize because I only need the direction
           vec1 = vertices[1] - vertices[0];
           vec2 = vertices[2] - vertices[0];
           dir = vec1.cross(vec2);

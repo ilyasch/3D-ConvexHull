@@ -18,8 +18,6 @@ public:
     void insertInFconflict(Pointd v, Dcel::Face *f);
     void insertInPconflict(Pointd v, Dcel::Face *f);
 
-    //TODO : change name or delete it if possible
-    Pointd getFaceNormalDirection(Dcel::Face *face);
 private:
     QMap<Dcel::Face*,QVector<Pointd>> P_conflict; //Map associate each face to the ensemble of vertices in the conflicts graphs
     QMap<Pointd,QVector<Dcel::Face*>> F_conflict; //Map associate each vetrex to the ensemble of faces in the conflicts graphs

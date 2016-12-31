@@ -107,7 +107,7 @@ unsigned int ConvexHullBuilder::randomPermutation(){
                    mVertices.at(i).x(),mVertices.at(i).y(),mVertices.at(i).z(),1.0
                    ).determinant();
         i++;
-    }while((det > -std::numeric_limits<double>::epsilon())&&(det < std::numeric_limits<double>::epsilon()));
+    }while((fabs(det) < std::numeric_limits<double>::epsilon()));
     return i-1;
 }
 /*!
@@ -115,30 +115,31 @@ unsigned int ConvexHullBuilder::randomPermutation(){
  * \param i
  */
 void ConvexHullBuilder::createTetrahedron(unsigned int i){
+    //Creat from the 3 first Vertices a plan
     Dcel::Vertex* p0 = mDcel->addVertex(mVertices.at(0));
     Dcel::Vertex* p1 = mDcel->addVertex(mVertices.at(1));
     Dcel::Vertex* p2 = mDcel->addVertex(mVertices.at(2));
-
+    //Vertices's half-edges
     Dcel::HalfEdge* h0_1 = mDcel->addHalfEdge();
     Dcel::HalfEdge* h1_2 = mDcel->addHalfEdge();
     Dcel::HalfEdge* h2_0 = mDcel->addHalfEdge();
-
+    // First face that represent my plan
     Dcel::Face* f0 = mDcel->addFace();
+    //----- Start Creating the first face == plan
+    h0_1->setFromVertex(p0);
+    h0_1->setToVertex(p1);
+    h0_1->setNext(h1_2);
+    h0_1->setPrev(h2_0);
 
-        h0_1->setFromVertex(p0);
-        h0_1->setToVertex(p1);
-        h0_1->setNext(h1_2);
-        h0_1->setPrev(h2_0);
+    h1_2->setFromVertex(p1);
+    h1_2->setToVertex(p2);
+    h1_2->setNext(h2_0);
+    h1_2->setPrev(h0_1);
 
-        h1_2->setFromVertex(p1);
-        h1_2->setToVertex(p2);
-        h1_2->setNext(h2_0);
-        h1_2->setPrev(h0_1);
-
-        h2_0->setFromVertex(p2);
-        h2_0->setToVertex(p0);
-        h2_0->setNext(h0_1);
-        h2_0->setPrev(h1_2);
+    h2_0->setFromVertex(p2);
+    h2_0->setToVertex(p0);
+    h2_0->setNext(h0_1);
+    h2_0->setPrev(h1_2);
 
     p0->setCardinality(2);
     p1->setCardinality(2);
@@ -147,13 +148,15 @@ void ConvexHullBuilder::createTetrahedron(unsigned int i){
     h0_1->setFace(f0);
     h1_2->setFace(f0);
     h2_0->setFace(f0);
+    //----- End Creating The first Plan
 
+    //Creating the 4th vertex that does not included in thr plan => connect each half-edge to this vertex
     Dcel::Vertex* p3 = mDcel->addVertex(mVertices.at(i));
     createFaceFromVertex(p3,h0_1);
     createFaceFromVertex(p3,h1_2);
     createFaceFromVertex(p3,h2_0);
 }
-/*!
+/*! This method is used in createTetrahedron in Order to create faces that connect the 4th Vertex
  * \brief ConvexHullBuilder::createFaceFromVertex
  * \param p3
  * \param mHalfEdge
@@ -218,6 +221,7 @@ QList<Dcel::HalfEdge*> ConvexHullBuilder::findHorizon(QVector<Dcel::Face*> mVisi
     QList<Dcel::HalfEdge*> mHorizon;
     bool searchForFirstHalfEdge = false;
     Dcel::HalfEdge* firstHalfEdge;
+    //In first time we are intersted to find the first face seen from our remaining vertex
     for(QVector<Dcel::Face*>::iterator it = mVisibleFaces.begin(); it < mVisibleFaces.end(); it++){
         Dcel::Face* visibleface = *it;
         for(Dcel::Face::IncidentHalfEdgeIterator itHalfEdge = visibleface->incidentHalfEdgeBegin(); !searchForFirstHalfEdge && itHalfEdge != visibleface->incidentHalfEdgeEnd();itHalfEdge++){
@@ -230,6 +234,7 @@ QList<Dcel::HalfEdge*> ConvexHullBuilder::findHorizon(QVector<Dcel::Face*> mVisi
             }
         }
     }
+    //When is founded : the method try to connect all the edges in the boundary to create the horizon
     if(searchForFirstHalfEdge){
         Dcel::HalfEdge *current, *next, *twinOfNext;
                 Dcel::Face *incidentFace;

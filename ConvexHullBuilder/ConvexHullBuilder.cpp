@@ -44,20 +44,20 @@ bool ConvexHullBuilder::build(bool showphases,MainWindow* mainWindow){
     createTetrahedron(point4_index);
     mG = new ConflictGraph(mDcel,mVertices);
     //Iteration Phase
-    for(unsigned int i=4;i<mVertices.size();i++){
+    for(unsigned int i=point4_index+1;i<mVertices.size();i++){
         Pointd p_r = mVertices.at(i);
         //- Determine visible facets for p(r) by checking G
-        std::vector<Dcel::Face*>* visibleFaces = mG->getVisibleFacesFromVertex(p_r);
+        QVector<Dcel::Face*>* visibleFaces = mG->getVisibleFacesFromVertex(p_r);
         if(visibleFaces->size() > 0){
            Dcel::Vertex* mRemainingVertex = mDcel->addVertex(p_r);
         //- Find horizon and add new facets to CH and G
            QList<Dcel::HalfEdge*> mHorizon = findHorizon(*visibleFaces);
-           QMap<Dcel::HalfEdge*,std::vector<Pointd>> mVisibleVetices = getVisibleVerticesFromHorizon(mHorizon);
+           QMap<Dcel::HalfEdge*,QVector<Pointd>> mVisibleVetices = getVisibleVerticesFromHorizon(mHorizon);
         //- Remove F_conflict(p(r)) from CH
            mG->deleteFaces(*visibleFaces);
            deleteFacesFromCH(*visibleFaces);
            //add new facets to CH and G from horizon
-           std::vector<Dcel::Face*> newFaces;
+           QVector<Dcel::Face*> newFaces;
            for(QList<Dcel::HalfEdge*>::iterator ith = mHorizon.begin(); ith != mHorizon.end(); ith++){
                Dcel::HalfEdge* halfEdge = *ith;
                //create a new face and push it in the vector of new faces
@@ -68,9 +68,6 @@ bool ConvexHullBuilder::build(bool showphases,MainWindow* mainWindow){
            }
            //set the twins using the ordered new faces vector
            setTwins(newFaces);
-
-
-
            if(showphases){
                mDcel->update();
                mainWindow->updateGlCanvas();
@@ -81,7 +78,7 @@ bool ConvexHullBuilder::build(bool showphases,MainWindow* mainWindow){
     }
     return true;
 }
-/*!
+/*! Insert all points from DCEL in a vector and reset it
  * \brief ConvexHullBuilder::init
  */
 void ConvexHullBuilder::init(){
@@ -217,11 +214,11 @@ void ConvexHullBuilder::createFaceFromVertex(Dcel::Vertex* p3,Dcel::HalfEdge* mH
  * \param mVisibleFaces
  * \return
  */
-QList<Dcel::HalfEdge*> ConvexHullBuilder::findHorizon(std::vector<Dcel::Face*> mVisibleFaces){
+QList<Dcel::HalfEdge*> ConvexHullBuilder::findHorizon(QVector<Dcel::Face*> mVisibleFaces){
     QList<Dcel::HalfEdge*> mHorizon;
     bool searchForFirstHalfEdge = false;
     Dcel::HalfEdge* firstHalfEdge;
-    for(std::vector<Dcel::Face*>::iterator it = mVisibleFaces.begin(); it < mVisibleFaces.end(); it++){
+    for(QVector<Dcel::Face*>::iterator it = mVisibleFaces.begin(); it < mVisibleFaces.end(); it++){
         Dcel::Face* visibleface = *it;
         for(Dcel::Face::IncidentHalfEdgeIterator itHalfEdge = visibleface->incidentHalfEdgeBegin(); !searchForFirstHalfEdge && itHalfEdge != visibleface->incidentHalfEdgeEnd();itHalfEdge++){
             Dcel::HalfEdge* visibleHalfEdge = *itHalfEdge;
@@ -261,8 +258,8 @@ QList<Dcel::HalfEdge*> ConvexHullBuilder::findHorizon(std::vector<Dcel::Face*> m
  * \param horizon
  * \return
  */
-QMap<Dcel::HalfEdge*,std::vector<Pointd>> ConvexHullBuilder::getVisibleVerticesFromHorizon(QList<Dcel::HalfEdge*> horizon){
-        QMap<Dcel::HalfEdge*,std::vector<Pointd>>  mVisibleVerticesinHorizon;
+QMap<Dcel::HalfEdge*,QVector<Pointd>> ConvexHullBuilder::getVisibleVerticesFromHorizon(QList<Dcel::HalfEdge*> horizon){
+        QMap<Dcel::HalfEdge*,QVector<Pointd>>  mVisibleVerticesinHorizon;
         //for each half edge in the horizon
         QList<Dcel::HalfEdge*>::iterator it;
         for(it=horizon.begin();it<horizon.end();it++){
@@ -271,11 +268,11 @@ QMap<Dcel::HalfEdge*,std::vector<Pointd>> ConvexHullBuilder::getVisibleVerticesF
             Dcel::Face *face1 = halfEdge->getFace();
             Dcel::Face *face2 = halfEdge->getTwin()->getFace();
             //get the set of the vertices visible from the former faces
-            std::vector<Pointd>* conflict1, *conflict2;
+            QVector<Pointd>* conflict1, *conflict2;
             conflict1 = mG->getVisibleVerticesFromFace(face1);
             conflict2 = mG->getVisibleVerticesFromFace(face2);
             //merge the sets
-            conflict1->insert(conflict1->end(),conflict2->begin(),conflict2->end());
+            conflict1->append(*conflict2);
             //associate the merged set to the horizon half edge
             mVisibleVerticesinHorizon.insert(halfEdge,*conflict1);
         }
@@ -285,8 +282,8 @@ QMap<Dcel::HalfEdge*,std::vector<Pointd>> ConvexHullBuilder::getVisibleVerticesF
  * \brief ConvexHullBuilder::deleteFacesFromCH
  * \param visiblefaces
  */
-void ConvexHullBuilder::deleteFacesFromCH(std::vector<Dcel::Face*> visiblefaces){
-    for(std::vector<Dcel::Face*>::iterator it = visiblefaces.begin();it<visiblefaces.end();it++){
+void ConvexHullBuilder::deleteFacesFromCH(QVector<Dcel::Face*> visiblefaces){
+    for(QVector<Dcel::Face*>::iterator it = visiblefaces.begin();it<visiblefaces.end();it++){
         Dcel::Face* face = *it;
         for(Dcel::Face::IncidentHalfEdgeIterator itHalfEdge = face->incidentHalfEdgeBegin(); itHalfEdge != face->incidentHalfEdgeEnd();itHalfEdge++){
             Dcel::HalfEdge* halfedge = *itHalfEdge;
@@ -359,10 +356,10 @@ Dcel::Face* ConvexHullBuilder::addFace(Dcel::Vertex* otherVertex, Dcel::HalfEdge
  * \brief ConvexHullBuilder::setTwins
  * \param faces
  */
-void ConvexHullBuilder::setTwins(std::vector<Dcel::Face*> &faces){
-    std::vector<Dcel::HalfEdge*> he1Set(faces.size());
-    std::vector<Dcel::HalfEdge*> he2Set(faces.size());
-    std::vector<Dcel::HalfEdge*> he3Set(faces.size());
+void ConvexHullBuilder::setTwins(QVector<Dcel::Face*> &faces){
+    QVector<Dcel::HalfEdge*> he1Set(faces.size());
+    QVector<Dcel::HalfEdge*> he2Set(faces.size());
+    QVector<Dcel::HalfEdge*> he3Set(faces.size());
 
     for(unsigned int i=0; i<faces.size(); i++){
         he1Set[i] = faces.at(i)->getOuterHalfEdge();

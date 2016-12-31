@@ -5,8 +5,8 @@
  * \param Dcel
  * \param Vertices
  */
-ConflictGraph::ConflictGraph(DrawableDcel* mDcel,std::vector<Pointd> mVertives){
-    for(std::vector<Pointd>::iterator it = mVertives.begin(); it != mVertives.end();it++){
+ConflictGraph::ConflictGraph(DrawableDcel* mDcel,QVector<Pointd> mVertives){
+    for(QVector<Pointd>::iterator it = mVertives.begin(); it != mVertives.end();it++){
         Pointd v = *it;
         for(Dcel::FaceIterator fit= mDcel->faceBegin();fit != mDcel->faceEnd();fit++){
             Dcel::Face* f= *fit;
@@ -22,38 +22,38 @@ ConflictGraph::ConflictGraph(DrawableDcel* mDcel,std::vector<Pointd> mVertives){
  * \param vertex
  * \return vector of faces
  */
-std::vector<Dcel::Face*>* ConflictGraph::getVisibleFacesFromVertex(Pointd vertex){
+QVector<Dcel::Face*>* ConflictGraph::getVisibleFacesFromVertex(Pointd vertex){
     if(!F_conflict.contains(vertex)) {
-        std::vector<Dcel::Face*> faces;
+        QVector<Dcel::Face*> faces;
         F_conflict.insert(vertex,faces);
     }
-    return new std::vector<Dcel::Face*>(F_conflict.value(vertex));
+    return new QVector<Dcel::Face*>(F_conflict.value(vertex));
 }
 /*!
  * \brief ConflictGraph::getVisibleVerticesFromFace
  * \param f
  * \return vector of vertices
  */
-std::vector<Pointd>* ConflictGraph::getVisibleVerticesFromFace(Dcel::Face* f){
+QVector<Pointd>* ConflictGraph::getVisibleVerticesFromFace(Dcel::Face* f){
     if(!P_conflict.contains(f)){
-      std::vector<Pointd> qv;
+      QVector<Pointd> qv;
       P_conflict.insert(f,qv);
     }
-    return new std::vector<Pointd>(P_conflict.value(f));
+    return new QVector<Pointd>(P_conflict.value(f));
 }
 /*!
  * \brief ConflictGraph::deleteFaces
  * \param visiblefaces
  */
-void ConflictGraph::deleteFaces(std::vector<Dcel::Face*> visiblefaces){
-    for(std::vector<Dcel::Face*>::const_iterator it = visiblefaces.begin();it<visiblefaces.end();it++){
+void ConflictGraph::deleteFaces(QVector<Dcel::Face*> visiblefaces){
+    for(QVector<Dcel::Face*>::const_iterator it = visiblefaces.begin();it<visiblefaces.end();it++){
         Dcel::Face* face = *it;
-        std::vector<Pointd> visiblevertices = P_conflict.value(face);
+        QVector<Pointd> visiblevertices = P_conflict.value(face);
         if(visiblevertices.size() != 0){
             P_conflict.remove(face);
-            for(std::vector<Pointd>::iterator itv = visiblevertices.begin();itv<visiblevertices.end();itv++){
+            for(QVector<Pointd>::iterator itv = visiblevertices.begin();itv<visiblevertices.end();itv++){
                 Pointd vertex = *itv;
-                std::vector<Dcel::Face*> facesAssTovertex = F_conflict.value(vertex);
+                QVector<Dcel::Face*> facesAssTovertex = F_conflict.value(vertex);
                 if(facesAssTovertex.size() != 0){
                     facesAssTovertex.erase(std::remove(facesAssTovertex.begin(), facesAssTovertex.end(), face), facesAssTovertex.end());
                 }
@@ -66,12 +66,12 @@ void ConflictGraph::deleteFaces(std::vector<Dcel::Face*> visiblefaces){
  * \param vertex
  */
 void ConflictGraph::deleteVertex(Pointd vertex){
-    std::vector<Dcel::Face*> facesAssTovertex = F_conflict.value(vertex);
+    QVector<Dcel::Face*> facesAssTovertex = F_conflict.value(vertex);
     if(facesAssTovertex.size() != 0){
         F_conflict.remove(vertex);
-        for(std::vector<Dcel::Face*>::iterator itf = facesAssTovertex.begin();itf<facesAssTovertex.end();itf++){
+        for(QVector<Dcel::Face*>::iterator itf = facesAssTovertex.begin();itf<facesAssTovertex.end();itf++){
             Dcel::Face* face = *itf;
-            std::vector<Pointd> verticesASsToThisFace = P_conflict.value(face);
+            QVector<Pointd> verticesASsToThisFace = P_conflict.value(face);
             verticesASsToThisFace.erase(std::remove(verticesASsToThisFace.begin(), verticesASsToThisFace.end(), vertex), verticesASsToThisFace.end());
         }
     }
@@ -110,10 +110,10 @@ bool ConflictGraph::IsVisibile(Dcel::Face* face, Pointd v){
  */
 void ConflictGraph::insertInFconflict(Pointd v, Dcel::Face *f){
         if(!F_conflict.value(v).empty()){
-          std::vector<Dcel::Face*> list = F_conflict.value(v);
+          QVector<Dcel::Face*> list = F_conflict.value(v);
           list.push_back(f);
         }else{
-            std::vector<Dcel::Face*> list;
+            QVector<Dcel::Face*> list;
             list.push_back(f);
             F_conflict.insert(v,list);
         }
@@ -125,10 +125,10 @@ void ConflictGraph::insertInFconflict(Pointd v, Dcel::Face *f){
  */
 void ConflictGraph::insertInPconflict(Pointd v, Dcel::Face *f){
         if(!P_conflict.value(f).empty()){
-          std::vector<Pointd> list = P_conflict.value(f);
+          QVector<Pointd> list = P_conflict.value(f);
           list.push_back(v);
         }else{
-            std::vector<Pointd> list;
+            QVector<Pointd> list;
             list.push_back(v);
             P_conflict.insert(f,list);
         }
@@ -138,9 +138,9 @@ void ConflictGraph::insertInPconflict(Pointd v, Dcel::Face *f){
  * \param face
  * \param candidateVertices
  */
-void ConflictGraph::updateConflictGraph(Dcel::Face* face, std::vector<Pointd> candidateVertices){
+void ConflictGraph::updateConflictGraph(Dcel::Face* face, QVector<Pointd> candidateVertices){
 
-    for(std::vector<Pointd>::iterator itv = candidateVertices.begin();itv<candidateVertices.end();itv++){
+    for(QVector<Pointd>::iterator itv = candidateVertices.begin();itv<candidateVertices.end();itv++){
         Pointd v = *itv;
         if(IsVisibile(face,v)){
             insertInFconflict(v,face);

@@ -38,7 +38,7 @@ sudo apt-get install doxygen
 
 Activate the doc in /lib:
 doxygen dcel_doxygen_config_it
-a "dcel_doc" in <HTML> will be generated
+a "dcel_doc" in "HTML" will be generated
 ### Not to do ###
 Don't try to work with Dcel::Vertex* instead Pointd, because random_shuffling don't return the exact coordinates(x,y,z).
 ### Contribution guidelines ###
